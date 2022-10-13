@@ -147,21 +147,19 @@ function App() {
                          board: BoardType,
                          ans: ItemType) {
         e.preventDefault()
-        //
+
         // alert(board.items.indexOf(ans)+":"+ans.text+" "+ board.items.indexOf(currentAnswer))
         // let dropIndex = currentBoard.items.indexOf(currentAnswer)
         // board.items.splice(currentAnswer.index, 1, ans)
 
-        setBoards(boards)
+        // setBoards(boards)
     }
 
 
     function dropBoardHandler(e: React.DragEvent<HTMLDivElement>, board: BoardType) {
         board.items.push(currentAnswer)
         let dropIndex = currentBoard.items.indexOf(currentAnswer)
-        currentBoard.items.splice(dropIndex, 0)
-
-        // console.log(currentBoard.id)
+        currentBoard.items.splice(dropIndex, 1)
         // currentBoard.items[dropIndex].enabled = !currentBoard.items[dropIndex].enabled
 
         setBoards(boards.map(boardItem => {
@@ -190,9 +188,9 @@ function App() {
     function translateCheck() {
         let sentence: string = ''
 
-        // boards[0].items.map(word => {
-        //     sentence += word.text + ' '
-        // })
+        boards[0].items.map(word => {
+            sentence += word.text + ' '
+        })
 
         let check = sentence === phrases[activePhrase].russian ?
             (loadPhrase(),
@@ -224,7 +222,7 @@ function App() {
                         </div>
                         <div className={answers}>
                             {/*{boards[boards.length - 1].id !== board.id &&*/}
-                            {board.items.map((ans: ItemType) => ans.enabled &&
+                            {board.items.sort(sortAnswers).map((ans: ItemType) => ans.enabled &&
                                 <span draggable={true}
                                       key={ans.id}
                                       onDragStart={(e) => dragStartHandler(e, board, ans)}
