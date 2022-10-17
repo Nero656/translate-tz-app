@@ -25,8 +25,6 @@ function App() {
         },
     ];
 
-    let [answersArray, setAnswersArray] = useState()
-
     let [boards, setBoards] = useState([
         {
             id: 0, items: []
@@ -41,82 +39,109 @@ function App() {
                     order: 0,
                     text: "Купить",
                     enabled: true
-                },
-                {
-                    id: 1,
-                    order: 1,
-                    text: "хлеб",
-                    enabled: true
-                },
-                {
-                    id: 2,
-                    order: 3,
-                    text: "Джон",
-                    enabled: true
-                },
-                {
-                    id: 3,
-                    order: 3,
-                    text: "будет",
-                    enabled: true
-                },
-                {
-                    id: 4,
-                    order: 4,
-                    text: "смотреть",
-                    enabled: true
-                },
-                {
-                    id: 5,
-                    order: 5,
-                    text: "не",
-                    enabled: true
-                },
-                {
-                    id: 6,
-                    order: 6,
-                    text: "Вечером",
-                    enabled: true
-                },
-                {
-                    id: 7,
-                    order: 7,
-                    text: "кино",
-                    enabled: true
-                },
-                {
-                    id: 8,
-                    order: 8,
-                    text: "Джейсон",
-                    enabled: true
-                },
-                {
-                    id: 9,
-                    order: 9,
-                    text: "любит",
-                    enabled: true
-                },
-                {
-                    id: 10,
-                    order: 10,
-                    text: "на",
-                    enabled: true
-                },
-                {
-                    id: 11,
-                    order: 11,
-                    text: "кататься",
-                    enabled: true
-                },
-                {
-                    id: 12,
-                    order: 12,
-                    text: "мотоцикле",
-                    enabled: true
                 }
             ]
         }
     ])
+    let [answersList, setAnswersList] = useState([
+        {
+            id: 0,
+            order: 0,
+            text: "Купить",
+            enabled: true
+        },
+        {
+            id: 1,
+            order: 1,
+            text: "хлеб",
+            enabled: true
+        },
+        {
+            id: 2,
+            order: 2,
+            text: "Джон",
+            enabled: true
+        },
+        {
+            id: 3,
+            order: 3,
+            text: "будет",
+            enabled: true
+        },
+        {
+            id: 4,
+            order: 4,
+            text: "смотреть",
+            enabled: true
+        },
+        {
+            id: 5,
+            order: 5,
+            text: "не",
+            enabled: true
+        },
+        {
+            id: 6,
+            order: 6,
+            text: "Вечером",
+            enabled: true
+        },
+        {
+            id: 7,
+            order: 7,
+            text: "кино",
+            enabled: true
+        },
+        {
+            id: 8,
+            order: 8,
+            text: "Джейсон",
+            enabled: true
+        },
+        {
+            id: 9,
+            order: 9,
+            text: "любит",
+            enabled: true
+        },
+        {
+            id: 10,
+            order: 10,
+            text: "на",
+            enabled: true
+        },
+        {
+            id: 11,
+            order: 11,
+            text: "кататься",
+            enabled: true
+        },
+        {
+            id: 12,
+            order: 12,
+            text: "мотоцикле",
+            enabled: true
+        },
+        {
+            id: 13,
+            order: 13,
+            text: "мотоцикле",
+            enabled: false
+        },
+        {
+            id: 14,
+            order: 14,
+            text: "мотоцикле",
+            enabled: false
+        },
+        {
+            id: 15,
+            order: 15,
+            text: "мотоцикле",
+            enabled: false
+        }
+    ])
+
 
     let [currentBoard, setCurrentBoard] = useState<any | null>(null);
     let [currentAnswer, setCurrentAnswer] = useState<any | null>(null);
@@ -147,20 +172,34 @@ function App() {
                          board: BoardType,
                          ans: ItemType) {
         e.preventDefault()
-
-        // alert(board.items.indexOf(ans)+":"+ans.text+" "+ board.items.indexOf(currentAnswer))
-        // let dropIndex = currentBoard.items.indexOf(currentAnswer)
-        // board.items.splice(currentAnswer.index, 1, ans)
-
-        // setBoards(boards)
+        setBoards(boards.map(boardItem => {
+            boardItem.items.map(item => {
+                if (item.id === ans.id) {
+                    return {...item, order: ans.order}
+                }
+                if (item.id === currentAnswer.id) {
+                    return {...item, order: item.order}
+                }
+                return item
+            })
+            return boardItem
+        }))
     }
 
-
     function dropBoardHandler(e: React.DragEvent<HTMLDivElement>, board: BoardType) {
-        board.items.push(currentAnswer)
+
         let dropIndex = currentBoard.items.indexOf(currentAnswer)
         currentBoard.items.splice(dropIndex, 1)
-        // currentBoard.items[dropIndex].enabled = !currentBoard.items[dropIndex].enabled
+
+        board.items.push(currentAnswer)
+
+
+        setAnswersList(answersList.map(answer => {
+            if (answer.id === currentAnswer.id) {
+                return {...currentAnswer, enabled: false}
+            }
+            return answer
+        }))
 
         setBoards(boards.map(boardItem => {
                 if (boardItem.id === board.id) {
@@ -172,6 +211,7 @@ function App() {
                 return boardItem
             }
         ))
+
     }
 
     const sortAnswers = (a: any, b: any) => {
@@ -192,13 +232,10 @@ function App() {
             sentence += word.text + ' '
         })
 
-        let check = sentence === phrases[activePhrase].russian ?
+        return sentence === phrases[activePhrase].russian ?
             (loadPhrase(),
                 setAnswerIsError(false)) :
             setAnswerIsError(true)
-
-
-        // console.log(sentence + ' ' + phrases[activePhrase].russian)
     }
 
     return (
@@ -221,37 +258,37 @@ function App() {
                             <hr/>
                         </div>
                         <div className={answers}>
-                            {/*{boards[boards.length - 1].id !== board.id &&*/}
-                            {board.items.sort(sortAnswers).map((ans: ItemType) => ans.enabled &&
-                                <span draggable={true}
-                                      key={ans.id}
-                                      onDragStart={(e) => dragStartHandler(e, board, ans)}
-                                      onDragEnd={(e) => dragEndHandler(e)}
-                                      onDragLeave={(e) => dragLeaveHandler(e)}
-                                      onDrop={(e) => dropHandler(e, board, ans)}
-                                      className={answer}>{ans.text}</span> || !ans.enabled &&
-                                <span key={ans.id} className={emptyAnswer}></span>
-                            )}
-
-                            {/*{boards[boards.length - 1].id === board.id &&*/}
-                            {/*    answersArray.sort(sortAnswers).map(ans => ans.enabled &&*/}
-                            {/*        <span draggable={true}*/}
-                            {/*              key={ans.id}*/}
-                            {/*              onDragStart={(e) => dragStartHandler(e, board, ans)}*/}
-                            {/*              onDragEnd={(e) => dragEndHandler(e)}*/}
-                            {/*              onDragLeave={(e) => dragLeaveHandler(e)}*/}
-                            {/*              onDragOver={(e) => dragOverHandler(e)}*/}
-                            {/*              onDrop={(e) => dropHandler(e, board, ans)}*/}
-                            {/*              className={answer}>{ans.text}</span> || !ans.enabled &&*/}
-                            {/*        <span key={ans.id} className={emptyAnswer}></span>)*/}
-                            {/*}*/}
+                            {boards[boards.length - 1].id !== board.id &&
+                                board.items.sort(sortAnswers).map(ans =>
+                                    <span draggable={true}
+                                          key={ans.id}
+                                          onDragStart={(e) => dragStartHandler(e, board, ans)}
+                                          onDragEnd={(e) => dragEndHandler(e)}
+                                          onDragLeave={(e) => dragLeaveHandler(e)}
+                                          onDragOver={(e) => dragOverHandler(e)}
+                                          onDrop={(e) => dropHandler(e, board, ans)}
+                                          className={answer}>{ans.text}
+                                    </span>
+                                )
+                            }
+                            {boards[boards.length - 1].id === board.id &&
+                                answersList.sort(sortAnswers).map((ans: ItemType) => ans.enabled &&
+                                    <span draggable={true}
+                                          key={ans.id}
+                                          onDragStart={(e) => dragStartHandler(e, board, ans)}
+                                          onDragEnd={(e) => dragEndHandler(e)}
+                                          onDragLeave={(e) => dragLeaveHandler(e)}
+                                          onDrop={(e) => dropHandler(e, board, ans)}
+                                          className={answer}>{ans.text}</span> || !ans.enabled &&
+                                    <span key={ans.id} className={emptyAnswer}></span>
+                                )
+                            }
                         </div>
                     </div>
                 )}
             </div>
 
-
-            {answerIsError === true &&
+            {answerIsError &&
                 <p className={errorAnswer}> Something wrong!</p>
             }
             <button onClick={event => {
@@ -352,46 +389,5 @@ const emptyAnswer = css`
 
 const errorAnswer = css`
   color: #FF0000;
-
 `
-
 export default App;
-
-
-/*<img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        */
-
-
-//
-//
-//
-//
-//
-//setAnswersArray(answersArray.map(item => {
-//     if (item.id === ans.id && ans.enabled === true) {
-//         return {...item, order: currentAnswer.order}
-//     }
-//     if (item.id === currentAnswer.id && currentAnswer.enabled === true) {
-//         return {...item, order: ans.order}
-//     }
-//     return item
-// }))
-//
-//
-//
-//
-//
-//
-//
-//
