@@ -24,7 +24,6 @@ function App() {
             english: 'Jason loves to ride a motorcycle'
         },
     ];
-
     let [boards, setBoards] = useState([
         {
             id: 0, items: []
@@ -142,7 +141,6 @@ function App() {
         }
     ])
 
-
     let [currentBoard, setCurrentBoard] = useState<any | null>(null);
     let [currentAnswer, setCurrentAnswer] = useState<any | null>(null);
     let [answerIsError, setAnswerIsError] = useState(false)
@@ -172,32 +170,45 @@ function App() {
                          board: BoardType,
                          ans: ItemType) {
         e.preventDefault()
+        let answer = board.items
+
+        answer = answer.map(item => {
+            if (item.id === ans.id) {
+                return {...item, order: currentAnswer.order}
+            }
+            if (item.id === currentAnswer.id) {
+                return {...item, order: ans.order}
+            }
+            return item
+        })
+
         setBoards(boards.map(boardItem => {
-            boardItem.items.map(item => {
-                if (item.id === ans.id) {
-                    return {...item, order: ans.order}
-                }
-                if (item.id === currentAnswer.id) {
-                    return {...item, order: item.order}
-                }
-                return item
-            })
+            if (boardItem.id === board.id) {
+                boardItem.items = answer
+                return boardItem
+            }
+            if (boardItem.id === currentBoard.id) {
+                return currentBoard
+            }
             return boardItem
         }))
     }
 
     function dropBoardHandler(e: React.DragEvent<HTMLDivElement>, board: BoardType) {
-
+        board.items.push(currentAnswer)
         let dropIndex = currentBoard.items.indexOf(currentAnswer)
         currentBoard.items.splice(dropIndex, 1)
 
-        board.items.push(currentAnswer)
-
 
         setAnswersList(answersList.map(answer => {
-            if (answer.id === currentAnswer.id) {
-                return {...currentAnswer, enabled: false}
+            if (answer.id === currentAnswer.id && board.id === boards[boards.length-1].id) {
+                return {...answer, enabled: true}
             }
+
+            if (answer.id === currentAnswer.id) {
+                return {...answer, enabled: false}
+            }
+
             return answer
         }))
 
@@ -211,7 +222,6 @@ function App() {
                 return boardItem
             }
         ))
-
     }
 
     const sortAnswers = (a: any, b: any) => {
@@ -221,20 +231,21 @@ function App() {
             return -1
     }
 
-
     function dragLeaveHandler(e: React.DragEvent<HTMLSpanElement>) {
     }
 
     function translateCheck() {
         let sentence: string = ''
 
-        boards[0].items.map(word => {
-            sentence += word.text + ' '
+        boards.map(line => {
+            line.items.map(word =>{
+                sentence += word.text + ' '
+            })
+            return line
         })
 
         return sentence === phrases[activePhrase].russian ?
-            (loadPhrase(),
-                setAnswerIsError(false)) :
+            (loadPhrase(), setAnswerIsError(false)) :
             setAnswerIsError(true)
     }
 
